@@ -1,14 +1,14 @@
-package com.pimaua87;
+package models;
 
-public class Lesson {
+public class Homework {
     private int id;
     private String name;
-    private final Homework homework;
+    private String description;
 
-    public Lesson(int id, String name, Homework homework) {
+    public Homework(int id, String name, String description) {
         this.id = id;
         this.name = name;
-        this.homework = homework;
+        this.description = description;
     }
 
     public int getId() {
@@ -27,12 +27,20 @@ public class Lesson {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
-        return "Lesson{" +
+        return "Homework{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", homework=" + homework +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

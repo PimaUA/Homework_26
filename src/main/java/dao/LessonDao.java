@@ -1,10 +1,13 @@
-package com.pimaua87;
+package dao;
+
+import models.Homework;
+import models.Lesson;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LessonDao implements Dao {
+public class LessonDao implements Dao<Integer> {
     private static final String SQL_ADD_LESSON = "INSERT INTO Lesson (name,updatedAt,homework_id) " +
             "VALUES(?,?,?);";
     private static final String SQL_DELETE_LESSON = "DELETE FROM lesson WHERE id=?;";
@@ -14,13 +17,10 @@ public class LessonDao implements Dao {
     private static final String SQL_SELECT_HOMEWORK_BY_ID = "SELECT homework.* FROM homework\n" +
             "JOIN lesson ON homework.id=lesson.id\n" +
             "AND homework.id=?;";
-    DataBaseConnection dataBaseConnection;
-    Lesson lesson;
-    Homework homework;
+    DataBaseConnection dataBaseConnection = new DataBaseConnection();
 
     @Override
-    public void addLesson(String name, Timestamp updatedAt, int homework_id) throws SQLException {
-        dataBaseConnection = new DataBaseConnection();
+    public void addLesson(String name, Timestamp updatedAt, Integer homework_id) throws SQLException {
         Connection newConnection = dataBaseConnection.getConnection();
         PreparedStatement preparedStatement = newConnection.prepareStatement(SQL_ADD_LESSON);
         preparedStatement.setString(1, name);
@@ -31,8 +31,7 @@ public class LessonDao implements Dao {
     }
 
     @Override
-    public void deleteLesson(int id) throws SQLException {
-        dataBaseConnection = new DataBaseConnection();
+    public void deleteLesson(Integer id) throws SQLException {
         Connection newCon = dataBaseConnection.getConnection();
         PreparedStatement preparedStatement = newCon.prepareStatement(SQL_DELETE_LESSON);
         preparedStatement.setInt(1, id);
@@ -41,8 +40,22 @@ public class LessonDao implements Dao {
     }
 
     @Override
+    public Lesson getLessonByID(Integer id) throws SQLException {
+        Lesson lesson = null;
+        Connection newConnection = dataBaseConnection.getConnection();
+        PreparedStatement preparedStatement = newConnection.prepareStatement(SQL_SELECT_LESSON_BY_ID);
+        preparedStatement.setInt(1, id);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            lesson = new Lesson(resultSet.getInt(1), resultSet.getString(2), getHomeworkByID(id));
+        }
+        dataBaseConnection.close(newConnection);
+        System.out.println(lesson);
+        return lesson;
+    }
+
     public List<Lesson> getAllLessons() throws SQLException {
-        dataBaseConnection = new DataBaseConnection();
+        Lesson lesson;
         Connection newConnection = dataBaseConnection.getConnection();
         Statement statement = newConnection.createStatement();
         ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL_LESSONS);
@@ -53,25 +66,12 @@ public class LessonDao implements Dao {
             lessons.add(lesson);
         }
         dataBaseConnection.close(newConnection);
+        System.out.println(lessons);
         return lessons;
     }
 
-    @Override
-    public Lesson getLessonByID(int id) throws SQLException {
-        dataBaseConnection = new DataBaseConnection();
-        Connection newConnection = dataBaseConnection.getConnection();
-        PreparedStatement preparedStatement = newConnection.prepareStatement(SQL_SELECT_LESSON_BY_ID);
-        preparedStatement.setInt(1, id);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet.next()) {
-            lesson = new Lesson(resultSet.getInt(1), resultSet.getString(2), getHomeworkByID(id));
-        }
-        dataBaseConnection.close(newConnection);
-        return lesson;
-    }
-
     public Homework getHomeworkByID(int id) throws SQLException {
-        dataBaseConnection = new DataBaseConnection();
+        Homework homework = null;
         Connection newConnection = dataBaseConnection.getConnection();
         PreparedStatement preparedStatement = newConnection.prepareStatement(SQL_SELECT_HOMEWORK_BY_ID);
         preparedStatement.setInt(1, id);
