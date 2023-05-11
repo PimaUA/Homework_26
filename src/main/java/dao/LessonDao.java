@@ -50,7 +50,6 @@ public class LessonDao implements Dao<Integer> {
             lesson = new Lesson(resultSet.getInt(1), resultSet.getString(2), getHomeworkByID(id));
         }
         dataBaseConnection.close(newConnection);
-        System.out.println(lesson);
         return lesson;
     }
 
@@ -66,7 +65,6 @@ public class LessonDao implements Dao<Integer> {
             lessons.add(lesson);
         }
         dataBaseConnection.close(newConnection);
-        System.out.println(lessons);
         return lessons;
     }
 
